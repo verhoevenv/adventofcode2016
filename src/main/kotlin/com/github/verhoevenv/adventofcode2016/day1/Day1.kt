@@ -1,5 +1,7 @@
 package com.github.verhoevenv.adventofcode2016.day1
 
+import com.github.verhoevenv.adventofcode2016.util.unfold
+
 fun distance(sequence:String) : Int {
     val steps = parse(sequence)
     return walk(steps).location.manhattanDistance()
@@ -37,25 +39,6 @@ fun visitedLocations(steps: List<Step>): List<Location> {
 }
 
 data class Itinerary(val pos: Position, val steps: List<Step>)
-
-fun <S, V> unfold(state: S, transition: (S) -> Pair<S, V>?) : Sequence<V> {
-
-    val iterator = object : Iterator<V> {
-        var s = state
-        override fun next(): V {
-            val (newS, v) = transition.invoke(s)!!
-            s = newS
-            return v
-        }
-
-        override fun hasNext(): Boolean {
-            return transition.invoke(s) != null
-        }
-    }
-
-    return Sequence { iterator }
-}
-
 
 data class Position(val location: Location, val dir: Direction) {
     fun turn(rot: Rotation) = Position(location, dir.turn(rot))
