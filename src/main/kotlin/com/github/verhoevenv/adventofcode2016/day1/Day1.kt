@@ -5,19 +5,74 @@ fun distance(sequence:String) : Int {
     return walk(steps).location.manhattanDistance()
 }
 
-fun walk(steps: List<Step>): Position {
-    return steps
-            .fold(Position(Location(0, 0), Direction.N)) {
-                prevPosition, step ->
-                val (rotation, dist) = step
-                prevPosition.turn(rotation).move(dist)
-            }
+fun distanceToFirstVisitedTwice(sequence:String) : Int {
+    val steps = parse(sequence)
+    return firstVisitedTwice(steps).manhattanDistance()
+}
+
+fun firstVisitedTwice(steps: List<Step>) : Location {
+    val visitedLocations = visitedLocations(steps)
+    val uniqueLocations = visitedLocations.distinct()
+    return firstDifferent(visitedLocations, uniqueLocations).first
+}
+
+private fun <T> firstDifferent(l1: List<T>, l2: List<T>) =
+        l1.zip(l2).first { it.first != it.second }
+
+fun walk(steps: List<Step>): Position =
+        steps.fold(Position(Location(0, 0), Direction.N), Position::step)
+
+fun visitedLocations(steps: List<Step>): List<Location> {
+
+    val visited: Sequence<Position> = unfold(Itinerary(Position(Location(0, 0), Direction.N), steps)) {
+        val (pos, furtherSteps) = it
+        if (furtherSteps.isEmpty()) null
+        else {
+            val visitedInStep: List<Position> = pos.stepExplicit(furtherSteps.first())
+            Pair(Itinerary(visitedInStep.last(), furtherSteps.drop(1)), visitedInStep)
+        }
+    }.flatten()
+
+    return visited.map(Position::location).toList()
+}
+
+data class Itinerary(val pos: Position, val steps: List<Step>)
+
+fun <S, V> unfold(state: S, transition: (S) -> Pair<S, V>?) : Sequence<V> {
+
+    val iterator = object : Iterator<V> {
+        var s = state
+        override fun next(): V {
+            val (newS, v) = transition.invoke(s)!!
+            s = newS
+            return v
+        }
+
+        override fun hasNext(): Boolean {
+            return transition.invoke(s) != null
+        }
+    }
+
+    return Sequence { iterator }
 }
 
 
 data class Position(val location: Location, val dir: Direction) {
     fun turn(rot: Rotation) = Position(location, dir.turn(rot))
     fun move(amount: Int) = Position(location.move(dir, amount), dir)
+    fun step(step: Step): Position {
+        val (rotation, dist) = step
+        return turn(rotation).move(dist)
+    }
+    fun moveExplicit(amount: Int) : List<Position> {
+        if(amount == 0) return emptyList()
+        val posAfterOneStep = move(1)
+        return listOf(posAfterOneStep) + posAfterOneStep.moveExplicit(amount - 1)
+    }
+    fun stepExplicit(step: Step): List<Position> {
+        val (rotation, dist) = step
+        return turn(rotation).moveExplicit(dist)
+    }
 }
 
 data class Location(val x: Int, val y: Int) {
@@ -75,10 +130,4 @@ data class Step(val turn: Rotation, val dist: Int)
 
 enum class Rotation {
     LEFT, RIGHT
-}
-
-fun decimalDigitValue(c: Char): Int {
-    if (c !in '0'..'9')
-        throw IllegalArgumentException("Out of range")
-    return c.toInt() - '0'.toInt()
 }

@@ -6,16 +6,29 @@ import io.kotlintest.specs.StringSpec
 
 class Day1Spec: StringSpec() {
     init {
-        "Example 1" {
+        "distance example 1" {
             distance("R2, L3") shouldBe 5
         }
 
-        "Example 2" {
+        "distance example 2" {
             distance("R2, R2, R2") shouldBe 2
         }
 
-        "Example 3" {
+        "distance example 3" {
             distance("R5, L5, R5, R3") shouldBe 12
+        }
+
+
+        "distance to first visited twice example" {
+            distanceToFirstVisitedTwice("R8, R4, R4, R8") shouldBe 4
+        }
+
+        "firstVisitedTwice for distance to first visited twice example" {
+            firstVisitedTwice(listOf(Step(RIGHT, 8), Step(RIGHT, 4), Step(RIGHT, 4), Step(RIGHT, 8))) shouldBe Location(4, 0)
+        }
+
+        "visitedLocations" {
+            visitedLocations(listOf(Step(RIGHT, 2))) shouldBe listOf(Location(1, 0), Location(2, 0))
         }
 
         "parseOne should create Step objects" {
