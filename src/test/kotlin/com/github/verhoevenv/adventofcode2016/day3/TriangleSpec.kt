@@ -1,7 +1,5 @@
 package com.github.verhoevenv.adventofcode2016.day3
 
-import com.github.verhoevenv.adventofcode2016.day1.Rotation.LEFT
-import com.github.verhoevenv.adventofcode2016.day1.Rotation.RIGHT
 import io.kotlintest.specs.StringSpec
 
 class TriangleSpec: StringSpec() {
