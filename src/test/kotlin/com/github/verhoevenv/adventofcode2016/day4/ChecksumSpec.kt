@@ -25,6 +25,23 @@ class ChecksumSpec: StringSpec() {
             Room("not-a-real-room", 404, "oarel").isRealRoom shouldBe true
             Room("totally-real-room", 200, "decoy").isRealRoom shouldBe false
         }
-        
+        "sum of sectors" {
+            sumOfSectorsOfRealRooms(listOf(
+                    "aaaaa-bbb-z-y-x-123[abxyz]",
+                    "a-b-c-d-e-f-g-h-987[abcde]",
+                    "not-a-real-room-404[oarel]",
+                    "totally-real-room-200[decoy]"
+            )) shouldBe 1514
+        }
+        "decrypt" {
+            Room("qzmt-zixmtkozy-ivhz", 343, "").decrypt shouldBe "very encrypted name"
+        }
+        "shiftForward" {
+            rotateForward(1, 'a') shouldBe 'b'
+            rotateForward(2, 'a') shouldBe 'c'
+            rotateForward(1, 'z') shouldBe 'a'
+            rotateForward(26, 'a') shouldBe 'a'
+        }
+
     }
 }

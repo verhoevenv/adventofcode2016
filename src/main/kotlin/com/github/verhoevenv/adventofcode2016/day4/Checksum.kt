@@ -9,6 +9,7 @@ fun sumOfSectorsOfRealRooms(roomStrings: List<String>): Int {
 
 data class Room(val name: String, val sectorId: Int, val checksum: String) {
     val isRealRoom = checksum(name) == checksum
+    val decrypt = name.map(curriedDecrypt(sectorId)).joinToString(separator = "")
 }
 
 fun parse(room: String): Room {
@@ -37,3 +38,13 @@ private val mostCommonLetter: Comparator<Pair<Char, Int>> =
 fun countOccurences(name: String): Map<Char, Int> {
     return name.groupBy { x -> x }.mapValues { entry -> entry.value.size }
 }
+
+fun curriedDecrypt(sectorId: Int): (Char) -> Char = { c -> decryptChar(sectorId, c) }
+
+fun decryptChar(sectorId: Int, char: Char): Char = when(char) {
+    in 'a'..'z' -> rotateForward(sectorId, char)
+    '-' -> ' '
+    else -> throw IllegalArgumentException("Unknown character: $char")
+}
+
+fun rotateForward(number: Int, char: Char): Char = ((char - 'a' + number) % 26 + 'a'.toInt()).toChar()
